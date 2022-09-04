@@ -2,8 +2,8 @@
 simple USB Webcam GUI using Halcon &amp; MFC
 ## Requirement
 ```ruby
-1. 'MVTec Halcon' >= 18.11
-2. 'Visual Studio' >= V.2019
+1. MVTec Halcon >= 18.11
+2. Visual Studio >= V.2019
 ```
 ## Installation
 1. Download and install MVTec Halcon >= 18.11
