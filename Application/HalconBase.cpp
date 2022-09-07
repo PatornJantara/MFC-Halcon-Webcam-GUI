@@ -39,6 +39,7 @@ UINT CHalconBase::Live() {
 	UINT uRetCode = eNoErr;
 
 	GrabImageStart(hv_AcqHandle, -1);
+	Sleep(100);		// For webcam process
 	GrabImageAsync(&ho_Image, hv_AcqHandle,-1);
 
 	return uRetCode;
