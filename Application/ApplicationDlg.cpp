@@ -12,7 +12,6 @@
 #define new DEBUG_NEW
 #endif
 
-static UINT TestStartThread(LPVOID param);
 
 // CAboutDlg dialog used for App About
 
@@ -68,12 +67,9 @@ BEGIN_MESSAGE_MAP(CApplicationDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON2, &CApplicationDlg::OnBnClickedButton2)
-	ON_BN_CLICKED(IDC_BUTTON3, &CApplicationDlg::OnBnClickedButton3)
 	ON_WM_TIMER()
 	ON_WM_VSCROLL()
-	ON_BN_CLICKED(IDC_BUTTON4, &CApplicationDlg::OnBnClickedButton4)
-	ON_BN_CLICKED(IDC_BUTTON5, &CApplicationDlg::OnBnClickedButton5)
+	ON_BN_CLICKED(IDC_BUTTON_SNAP, &CApplicationDlg::OnBnClickedButtonSnap)
 END_MESSAGE_MAP()
 
 
@@ -108,52 +104,16 @@ BOOL CApplicationDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
+
+
 	// TODO: Add extra initialization here
-	SetTimer(ID_TIMER,TIMER,NULL);
 
-	OpenWindow(0, 0, 640, 480, (Hlong)this->m_hWnd, "visible", "", &m_pHalconBase->hv_WindowHandle);
-	SetPart(m_pHalconBase->hv_WindowHandle, 0, 0, 479, 639);
-	m_pHalconBase->ho_Image.GenEmptyObj();
+	m_pHalconBase = new CHalconBase();
 
-	for (size_t i = 0; i < eCamParam::eEndCamParam; i++)
-	{
-		m_pSlider[i] = new CSliderCtrl();
-	}
-
-	int min = 1, max = 255;
-
-	m_pSlider[eBrightness]->Create(WS_CHILD | WS_VISIBLE, CRect(650,170,800, 180), this, IDC_SLIDER1);
-	m_pSlider[eBrightness]->SetRange(min, max);
-	m_pSlider[eBrightness]->SetPos((max - min) / 2);
-
-	m_pSlider[eConstrast]->Create(WS_CHILD | WS_VISIBLE, CRect(650, 190, 800, 200), this, IDC_SLIDER2);
-	m_pSlider[eConstrast]->SetRange(min, max);
-	m_pSlider[eConstrast]->SetPos((max - min) / 2);
-
-	min = 10; max =200;
-	m_pSlider[eSaturation]->Create(WS_CHILD | WS_VISIBLE, CRect(650, 210, 800, 220), this, IDC_SLIDER3);
-	m_pSlider[eSaturation]->SetRange(min, max);
-	m_pSlider[eSaturation]->SetPos((max - min) / 2);
-
-	m_pSlider[eSharpness]->Create(WS_CHILD | WS_VISIBLE, CRect(650, 230, 800, 240), this, IDC_SLIDER4);
-	m_pSlider[eSharpness]->SetRange(min, max);
-	m_pSlider[eSharpness]->SetPos((max - min) / 2);
-
-	min = 2800; max = 6500;
-	m_pSlider[eWhiteBalance]->Create(WS_CHILD | WS_VISIBLE, CRect(650, 250, 800, 260), this, IDC_SLIDER5);
-	m_pSlider[eWhiteBalance]->SetRange(min, max);
-	m_pSlider[eWhiteBalance]->SetPos(((max - min) / 2) + min);
-
-	min = 30; max =30;
-	m_pSlider[eFramerate]->Create(WS_CHILD | WS_VISIBLE, CRect(650, 270, 800, 280), this, IDC_SLIDER6);
-	m_pSlider[eFramerate]->SetRange(min, max);
-	m_pSlider[eFramerate]->SetPos((max - min) / 2);
-
-	min = 1; max = 150;
-	m_pSlider[eZoom]->Create(WS_CHILD | WS_VISIBLE, CRect(650, 290,800, 300), this, IDC_SLIDER7);
-	m_pSlider[eZoom]->SetRange(min, max);
-	m_pSlider[eZoom]->SetPos((max - min) / 2);
-
+	Init();
+	InitDialog();
+	
+	SetTimer(ID_TIMER, TIMER, NULL);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -209,21 +169,19 @@ HCURSOR CApplicationDlg::OnQueryDragIcon()
 
 void CApplicationDlg::OnTimer(UINT_PTR nIDEvent)
 {
-	int n = 0;
 
+	for (int nProp = eBrightness; nProp < eEndCamParam; nProp++) {
 
-	if (m_pHalconBase->m_bFlgBusy) {
+		if (m_nSlider[nProp] != m_pSlider[nProp]->GetPos()) {
+			
+			m_nSlider[nProp] = m_pSlider[nProp]->GetPos();
 
-		for (size_t i = 0; i < eCamParam::eEndCamParam; i++)
-		{
-			n = m_pSlider[i]->GetPos();
-			m_pHalconBase->SetParam(i, m_pSlider[i]->GetPos());
+			m_pHalconBase->SetCam(nProp, m_nSlider[nProp]);
 		}
-		
-		m_pHalconBase->Live();
+	
 	}
 
-	DispObj(m_pHalconBase->ho_Image, m_pHalconBase->hv_WindowHandle);
+	m_pHalconBase->Live();
 
 
 	CDialog::OnTimer(nIDEvent);
@@ -232,98 +190,70 @@ void CApplicationDlg::OnTimer(UINT_PTR nIDEvent)
 
 
 
-//	Multi webcam thread
-static UINT TestStartThread(LPVOID param) {
-
-	UINT uRetCode = eNoErr;
-
-	CHalconBase* sudoHalconBase = (CHalconBase*)param;
-
-	///////////// add To Do here //////////////////////
 
 
 
-	return uRetCode;
-}
 
-// Multi webcam shot
-// !!!!! Not complete
+void CApplicationDlg::Init() {
 
-void CApplicationDlg::OnBnClickedButton2()
-{
+	TCHAR buff[MAX_PATH];
+	memset(buff, 0, MAX_PATH);
+	
+	::GetModuleFileName(NULL, buff, sizeof(buff));
 
-	DWORD dwRetThread = 0;
-
-	CWinThread* pThread;
+	m_strFolder = buff;
+	m_strFolder = m_strFolder.Left(m_strFolder.ReverseFind(_T('\\')) + 1);
 
 
-	LPVOID lpFlgThread = static_cast<LPVOID>(m_pHalconBase);
-
-
-	pThread = AfxBeginThread(TestStartThread
-		, lpFlgThread, THREAD_PRIORITY_NORMAL, 0, 0, NULL);
-
-
-	WaitForSingleObject(pThread, INFINITE);
 
 
 }
 
 
 
-void CApplicationDlg::OnBnClickedButton3()
-{
-	// TODO: Add your control notification handler code here
 
+void CApplicationDlg::InitDialog() {
 
-	HObject HSnapImg = m_pHalconBase->ho_Image.Clone();
+	OpenWindow(0, 0, 640, 480, (Hlong)this->m_hWnd, "visible", "", &m_pHalconBase->hv_WindowHandle);
+	SetPart(m_pHalconBase->hv_WindowHandle, 0, 0, 479, 639);
 
-	CFileDialog DialogSave(FALSE, // TRUE for FileOpen, FALSE for FileSaveAs
-							_T(".jpeg"),
-							NULL,
-							OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
-							_T("(*.jpeg)|*.jpeg||"),
-							NULL,
-							0,
-							TRUE);
-
-	// A dialog box with several filters for various media file types
-	static int LastIndex = -1;          // Holds the last used filter. You can store it in the Registry to use it during next run.
-
-
-	if (LastIndex != -1) DialogSave.m_ofn.nFilterIndex = LastIndex; // restore last used index 
-														// from last time
-
-	if (DialogSave.DoModal() == IDOK)
+	
+	for (size_t i = 0; i < eCamParam::eEndCamParam; i++)
 	{
-		LastIndex = DialogSave.m_ofn.nFilterIndex; // Store last used index for next time
-		CString sFilePath = DialogSave.GetPathName();
+		m_pSlider[i] = new CSliderCtrl();
+	}
+	memset(m_nSlider, 0, sizeof(m_nSlider));
 
-		CStringA str(sFilePath);
 
-		const char* ImgSave = str;
 
-		HalconCpp::WriteImage(HSnapImg, "jpeg", 0, ImgSave);
+	for (int nPropBar = eBrightness; nPropBar < eEndCamParam; nPropBar++) {
+
+		m_pSlider[nPropBar]->Create(	WS_CHILD | WS_VISIBLE,
+										CRect(650, 170 +nPropBar*20, 800, 180 + nPropBar*20),
+										this, IDC_SLIDER1);
+
+		m_pSlider[nPropBar]->SetRange(CAM_PROP[nPropBar][eMin], CAM_PROP[nPropBar][eMax]);
+		m_pSlider[nPropBar]->SetPos(CAM_PROP_DEFAULT[nPropBar]);
+		m_nSlider[nPropBar] = m_pSlider[nPropBar]->GetPos();
 
 	}
-}
 
-// Stop button
-void CApplicationDlg::OnBnClickedButton4()
-{
-	// TODO: Add your control notification handler code here
-
-	m_pHalconBase->Stop();
 
 }
 
-// Connect cam button
-void CApplicationDlg::OnBnClickedButton5()
+
+
+
+
+
+void CApplicationDlg::OnBnClickedButtonSnap()
 {
 	// TODO: Add your control notification handler code here
-	if (m_pHalconBase->m_bFlgBusy)		return;
 
-	m_pHalconBase->OpenCam();
+	KillTimer(ID_TIMER);
 
 
+	m_pHalconBase->Snap(m_strFolder);
+
+	SetTimer(ID_TIMER, TIMER, NULL);
 }

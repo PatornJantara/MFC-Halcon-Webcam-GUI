@@ -6,8 +6,8 @@
 
 #include "HalconBase.h"
 
-#define TIMER 100
-#define ID_TIMER 11
+#define TIMER 100			// msec
+#define ID_TIMER 11			
 
 // CApplicationDlg dialog
 class CApplicationDlg : public CDialogEx
@@ -24,6 +24,10 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
+private :
+
+	void Init();
+	void InitDialog();
 
 // Implementation
 protected:
@@ -37,21 +41,18 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
+
+
+
+private :
+
+	CHalconBase*	m_pHalconBase;
+	CSliderCtrl*	m_pSlider[eCamParam::eEndCamParam];
+	int				m_nSlider[eCamParam::eEndCamParam];
+	CString			m_strFolder;
+
+
 public:
-	afx_msg void OnBnClickedButton1();
-	afx_msg void OnBnClickedButton2();
-	afx_msg void OnBnClickedButton3();
-
-
-
-public:
-
-	CHalconBase* m_pHalconBase;
-	afx_msg void OnBnClickedButton4();
-	afx_msg void OnBnClickedButton5();
-
-	CSliderCtrl* m_pSlider[eCamParam::eEndCamParam];
-
-	int			 m_nSlider[eCamParam::eEndCamParam];
+	afx_msg void OnBnClickedButtonSnap();
 };
 

@@ -76,9 +76,6 @@ BOOL CApplicationApp::InitInstance()
 	m_pMainWnd = &dlg;
 
 
-
-	dlg.m_pHalconBase = new CHalconBase();
-
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
 	{
@@ -96,7 +93,6 @@ BOOL CApplicationApp::InitInstance()
 		TRACE(traceAppMsg, 0, "Warning: if you are using MFC controls on the dialog, you cannot #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS.\n");
 	}
 
-	if (dlg.m_pHalconBase != NULL) delete dlg.m_pHalconBase;
 
 	// Delete the shell manager created above.
 	if (pShellManager != nullptr)

@@ -16,23 +16,30 @@ public :
 	CHalconBase();
 	~CHalconBase();
 
-	UINT OpenCam();
-	UINT Live();
-	UINT Stop();
-	
-	void SetParam(int nSelect, int nVal);
-
-	void GetErrCode(eErrorCode eErrorCode);
-
 
 public:
 	HObject		ho_Image;					// Image
 	HTuple		hv_WindowHandle;			// Halcon Window Handle
 	HTuple		hv_AcqHandle;				// Halcon Webcam Handle
 
-
-	bool		m_bFlgBusy = false;			// Is port open ?
+	HTuple		hv_Width, hv_Height;
 
 	int			m_nArrCamParam[eCamParam::eEndCamParam];			// parameter of webcam
+private:
+
+	void Start();
+	void Stop();
+
+public:
+
+	void SetCam(int nSelect, int nVal);
+
+	void Snap(CString strSavePath);
+
+	void Live();
+
+
+
+
 
 };

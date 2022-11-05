@@ -21,6 +21,12 @@ enum eErrorCode {
 	eEndErrorCode,
 };
 
+enum MIN_MAX {
+	eMin = 0,
+	eMax = 1,
+	eMIN_MAX,
+};
+
 // Webcam Hikvision U02-36
 enum eCamParam {
 
@@ -33,4 +39,27 @@ enum eCamParam {
 	eZoom			,	// 1-150
 
 	eEndCamParam
+};
+
+const int CAM_PROP[eEndCamParam][eMIN_MAX]{
+
+	{1,255},
+	{1,255},
+	{10,200},
+	{1,255},
+	{2800 , 6500},
+	{30,30},
+	{1,50},
+
+};
+
+const int CAM_PROP_DEFAULT[eEndCamParam]{
+
+	100,
+	100,
+	100,
+	90,
+	4500,
+	30,
+	30,
 };
