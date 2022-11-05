@@ -17,7 +17,7 @@ and then add "MVTec\HALCON-XX.XX-XXXX\lib\x64-win64"<br />
 3.Go to solution properties -> Linker -> Input -> Additional dependencies<br />
 ,then add "MVTec\HALCON-XX.XX-XXXX\lib\x64-win64\halconcpp.lib"<br />
 ## Application
-![Capture](https://user-images.githubusercontent.com/56642026/188307114-a1f7302f-d08c-4247-b751-a1de53e03c12.PNG)
+![Screenshot 2022-11-05 140714](https://user-images.githubusercontent.com/56642026/200107451-8a601cf9-ec30-4154-9ef4-7ade4292c9f4.png)
 <br /> More functionable than traditional webcam interface on Window,You can adjust advanced parameter using this application.
 ## !!! Warning
 **Be careful to adjust your webcam properties.An invalid parameter or over specification uses**<br />
