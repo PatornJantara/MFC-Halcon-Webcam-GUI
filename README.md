@@ -23,7 +23,5 @@ and then add "MVTec\HALCON-XX.XX-XXXX\lib\x64-win64"<br />
 **Be careful to adjust your webcam properties.An invalid parameter or over specification uses**<br />
 **will be cause of broken webcam**<br />
 You can see available adjust parameter using Hdeveloper -> Image acquisition.<br />
-## Remark
-There is a multithreading function that allows you to control multi webcam but i doesn't test it yet dueto lack of hardware.
 ## License
 **MVTec Halcon**
